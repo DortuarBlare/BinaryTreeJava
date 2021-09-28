@@ -56,7 +56,18 @@ public class BinaryTree<Type> {
 
     public Node findByIndex(int index) {
         Node currentNode = root;
-
+        int currentIndex = (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0);
+        while (index != currentIndex) {
+            if (index < currentIndex) {
+                currentNode = currentNode.getLeftChild();
+                currentIndex -= (currentNode.getRightChild() != null ? currentNode.getRightChild().getWeight() : 0) + 1;
+            }
+            else {
+                currentNode = currentNode.getRightChild();
+                currentIndex += (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0) + 1;
+            }
+            if (currentNode == null) return null;
+        }
         return currentNode;
     }
 
