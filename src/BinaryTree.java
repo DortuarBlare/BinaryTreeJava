@@ -57,6 +57,7 @@ public class BinaryTree<Type> {
     public Node findByIndex(int index) {
         Node currentNode = root;
         int currentIndex = (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0);
+
         while (index != currentIndex) {
             if (index < currentIndex) {
                 currentNode = currentNode.getLeftChild();
@@ -69,6 +70,74 @@ public class BinaryTree<Type> {
             if (currentNode == null) return null;
         }
         return currentNode;
+    }
+
+    public void deleteByIndex(int index) {
+        root.setWeight(root.getWeight() - 1);
+        Node currentNode = root;
+        int currentIndex = (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0);
+        boolean isLeftChild = true;
+
+        while (index != currentIndex) { // Поиск удаляемого узла с заданным индексом
+            if (index < currentIndex) {
+                isLeftChild = true;
+                currentNode = currentNode.getLeftChild();
+                currentIndex -= (currentNode.getRightChild() != null ? currentNode.getRightChild().getWeight() : 0) + 1;
+            }
+            else {
+                isLeftChild = false;
+                currentNode = currentNode.getRightChild();
+                currentIndex += (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0) + 1;
+            }
+            if (currentNode == null) return;
+            else currentNode.setWeight(currentNode.getWeight() - 1);
+        }
+
+        if (currentNode.getLeftChild() == null && currentNode.getRightChild() == null) { // Если у узла нет потомков
+            if (currentNode == root) root = null;
+            else if (isLeftChild) currentNode.getParent().setLeftChild(null);
+            else currentNode.getParent().setRightChild(null);
+        }
+        else if (currentNode.getRightChild() == null) { // Если у узла нет правого потомка(замена левым поддеревом)
+            if (currentNode == root) root = currentNode.getLeftChild();
+            else if (isLeftChild) currentNode.getParent().setLeftChild(currentNode.getLeftChild());
+            else currentNode.getParent().setRightChild(currentNode.getLeftChild());
+        }
+        else if (currentNode.getLeftChild() == null) { // Если у узла нет левого потомка(замена правым поддеревом)
+            if (currentNode == root) root = currentNode.getRightChild();
+            else if (isLeftChild) currentNode.getParent().setLeftChild(currentNode.getRightChild());
+            else currentNode.getParent().setRightChild(currentNode.getRightChild());
+        }
+        else { // Если у узла два потомка
+            Node heir = findHeir(currentNode);
+            if (currentNode == root) {
+                heir.setWeight(root.getWeight());
+                root = heir;
+            }
+            else if (isLeftChild) currentNode.getParent().setLeftChild(heir);
+            else currentNode.getParent().setRightChild(heir);
+        }
+    }
+
+    public Node<Type> findHeir(Node nodeThatNeedHeir) {
+        /*Node heir = nodeThatNeedHeir;
+        Node currentNode = nodeThatNeedHeir.getRightChild();
+
+        while (currentNode != null) {
+            heir = currentNode;
+            currentNode = currentNode.getLeftChild();
+        }*/
+        Node heir = nodeThatNeedHeir.getRightChild() != null ? nodeThatNeedHeir.getRightChild() : nodeThatNeedHeir;
+
+        while (heir.getLeftChild() != null) heir = heir.getLeftChild();
+
+        if (heir != nodeThatNeedHeir.getRightChild()) { // Если наследник не правый потомок
+            heir.getParent().setLeftChild(heir.getRightChild());
+            heir.setLeftChild(nodeThatNeedHeir.getLeftChild());
+            heir.setRightChild(nodeThatNeedHeir.getRightChild());
+        }
+        else heir.setLeftChild(nodeThatNeedHeir.getLeftChild());
+        return heir;
     }
 
     public void print() { // метод для вывода дерева в консоль

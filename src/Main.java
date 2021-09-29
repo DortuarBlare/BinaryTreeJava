@@ -8,6 +8,8 @@ public class Main {
         for (int i = 0; i < 10; i++)
             binaryTree.add(randomGenerator.nextInt(100) + 1);
         binaryTree.print();
-        System.out.println(binaryTree.findByIndex(2));
+        int rootIndex = binaryTree.getRoot().getLeftChild() != null ? binaryTree.getRoot().getLeftChild().getWeight() : 0;
+        binaryTree.deleteByIndex(2);
+        binaryTree.print();
     }
 }
