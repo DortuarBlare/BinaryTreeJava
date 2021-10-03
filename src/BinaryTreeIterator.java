@@ -1,24 +1,32 @@
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public class BinaryTreeIterator implements Iterator<Node> {
+    private BinaryTree binaryTree;
     private Node currentNode;
     private int size;
+    private int index = 0;
 
-    public BinaryTreeIterator(Node currentNode, int size) {
-        this.currentNode = currentNode;
-        this.size = size;
+    public BinaryTreeIterator(BinaryTree binaryTree) {
+        this.binaryTree = binaryTree;
+        this.size = binaryTree.getRoot().getWeight();
     }
 
     @Override
     public boolean hasNext() {
-
+        if (binaryTree.findByIndex(index) != null) return true;
         return false;
     }
 
     @Override
-    public Node next() {
-        return null;
+    public Node next() throws NoSuchElementException {
+        if (size <= 0) throw new NoSuchElementException("No more nodes in tree!");
+        try {
+            currentNode = binaryTree.findByIndex(index++);
+            return currentNode;
+        }
+        finally { size--; }
     }
 
     @Override

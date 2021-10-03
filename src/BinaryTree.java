@@ -2,7 +2,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Stack;
 
-public class BinaryTree<Type> implements Iterable<Type> {
+public class BinaryTree<Type> implements Iterable<Node> {
     private Node<Type> root;
     private NodeComparator nodeComparator;
 
@@ -61,13 +61,14 @@ public class BinaryTree<Type> implements Iterable<Type> {
         while (index != currentIndex) {
             if (index < currentIndex) {
                 currentNode = currentNode.getLeftChild();
+                if (currentNode == null) return null;
                 currentIndex -= (currentNode.getRightChild() != null ? currentNode.getRightChild().getWeight() : 0) + 1;
             }
             else {
                 currentNode = currentNode.getRightChild();
+                if (currentNode == null) return null;
                 currentIndex += (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0) + 1;
             }
-            if (currentNode == null) return null;
         }
         return currentNode;
     }
@@ -202,7 +203,8 @@ public class BinaryTree<Type> implements Iterable<Type> {
     public int getSize() { return root.getWeight(); }
 
     @Override
-    public Iterator<Type> iterator() {
-        return null;
+    public Iterator<Node> iterator() {
+        return new BinaryTreeIterator(this);
     }
+
 }
