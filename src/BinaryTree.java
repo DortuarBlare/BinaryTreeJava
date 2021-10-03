@@ -1,7 +1,8 @@
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Stack;
 
-public class BinaryTree<Type> {
+public class BinaryTree<Type> implements Iterable<Type> {
     private Node<Type> root;
     private NodeComparator nodeComparator;
 
@@ -10,16 +11,15 @@ public class BinaryTree<Type> {
         nodeComparator = new NodeComparator();
     }
 
-    public void add(Type value) { // метод вставки нового элемента
-        Node newNode = new Node(value); // создание нового узла
-        if (root == null) root = newNode; // Если нет корня
+    public void add(Type value) {
+        Node newNode = new Node(value);
+        if (root == null) root = newNode;
         else if (findByValue(value) == null) {
             root.setWeight(root.getWeight() + 1);
-            Node currentNode = root; // Начинаем с корневого узла
+            Node currentNode = root;
             Node parentNode;
             while (true) {
                 parentNode = currentNode;
-                //if (value == currentNode.getValue()) return;    // Если уже есть элемент с таким значением
                 if (newNode.compareTo(currentNode) < 0) {   // движение влево?
                     currentNode = currentNode.getLeftChild();
                     if (currentNode == null) { // если был достигнут конец цепочки,
@@ -82,15 +82,16 @@ public class BinaryTree<Type> {
             if (index < currentIndex) {
                 isLeftChild = true;
                 currentNode = currentNode.getLeftChild();
+                if (currentNode == null) return;
                 currentIndex -= (currentNode.getRightChild() != null ? currentNode.getRightChild().getWeight() : 0) + 1;
             }
             else {
                 isLeftChild = false;
                 currentNode = currentNode.getRightChild();
+                if (currentNode == null) return;
                 currentIndex += (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0) + 1;
             }
-            if (currentNode == null) return;
-            else currentNode.setWeight(currentNode.getWeight() - 1);
+            currentNode.setWeight(currentNode.getWeight() - 1);
         }
 
         if (currentNode.getLeftChild() == null && currentNode.getRightChild() == null) { // Если у узла нет потомков
@@ -120,16 +121,12 @@ public class BinaryTree<Type> {
     }
 
     public Node<Type> findHeir(Node nodeThatNeedHeir) {
-        /*Node heir = nodeThatNeedHeir;
-        Node currentNode = nodeThatNeedHeir.getRightChild();
-
-        while (currentNode != null) {
-            heir = currentNode;
-            currentNode = currentNode.getLeftChild();
-        }*/
         Node heir = nodeThatNeedHeir.getRightChild() != null ? nodeThatNeedHeir.getRightChild() : nodeThatNeedHeir;
 
-        while (heir.getLeftChild() != null) heir = heir.getLeftChild();
+        while (heir.getLeftChild() != null) {
+            heir.setWeight(heir.getWeight() - 1);
+            heir = heir.getLeftChild();
+        }
 
         if (heir != nodeThatNeedHeir.getRightChild()) { // Если наследник не правый потомок
             heir.getParent().setLeftChild(heir.getRightChild());
@@ -140,45 +137,72 @@ public class BinaryTree<Type> {
         return heir;
     }
 
-    public void print() { // метод для вывода дерева в консоль
+    public void print(String indexOrWeight) { // Вывод дерева с весом узлов в консоль
         Stack globalStack = new Stack(); // общий стек для значений дерева
         globalStack.push(root);
         int gaps = 64; // начальное значение расстояния между элементами
         boolean isRowEmpty = false;
         String separator = "-----------------------------------------------------------------";
-        System.out.println(separator); // черта для указания начала нового дерева
+        System.out.print(separator);
+        System.out.println(separator);
 
         while (isRowEmpty == false) {
             Stack localStack = new Stack(); // локальный стек для задания потомков элемента
             isRowEmpty = true;
 
-            for (int j = 0; j < gaps; j++)
-                System.out.print(' ');
+            for (int j = 0; j < gaps; j++) System.out.print(' ');
+
             while (globalStack.isEmpty() == false) { // покуда в общем стеке есть элементы
                 Node temp = (Node) globalStack.pop(); // берем следующий, при этом удаляя его из стека
                 if (temp != null) {
-                    System.out.print(temp.getValue() + "(" + temp.getWeight() + ")"); // выводим его значение в консоли
+                    if (indexOrWeight == "index") System.out.print(temp.getValue() + "(" + getIndex(temp) + ")");
+                    else System.out.print(temp.getValue() + "(" + temp.getWeight() + ")");
+
                     localStack.push(temp.getLeftChild()); // соохраняем в локальный стек, наследники текущего элемента
                     localStack.push(temp.getRightChild());
-                    if (temp.getLeftChild() != null ||
-                            temp.getRightChild() != null)
-                        isRowEmpty = false;
+                    if (temp.getLeftChild() != null || temp.getRightChild() != null) isRowEmpty = false;
                 }
                 else {
                     System.out.print("__");// - если элемент пустой
                     localStack.push(null);
                     localStack.push(null);
                 }
-                for (int j = 0; j < gaps * 2 - 2; j++)
-                    System.out.print(' ');
+                for (int j = 0; j < gaps * 2 - 2; j++) System.out.print(' ');
             }
             System.out.println();
             gaps /= 2;// при переходе на следующий уровень расстояние между элементами каждый раз уменьшается
             while (localStack.isEmpty() == false)
                 globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
         }
+        System.out.print(separator);
         System.out.println(separator);
     }
 
+    public int getIndex(Node nodeForIndex) {
+        Node currentNode = root;
+        int currentIndex = (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0);
+
+        while (nodeForIndex.getValue() != currentNode.getValue()) {
+            if (nodeForIndex.compareTo(currentNode) < 0) {
+                currentNode = currentNode.getLeftChild();
+                currentIndex -= (currentNode.getRightChild() != null ? currentNode.getRightChild().getWeight() : 0) + 1;
+            }
+            else {
+                currentNode = currentNode.getRightChild();
+                currentIndex += (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0) + 1;
+            }
+
+            if(currentNode == null) return -1;
+        }
+        return currentIndex;
+    }
+
     public Node<Type> getRoot() { return this.root; }
+
+    public int getSize() { return root.getWeight(); }
+
+    @Override
+    public Iterator<Type> iterator() {
+        return null;
+    }
 }

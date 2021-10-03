@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.TreeSet;
 
 public class Main {
 
@@ -7,9 +8,14 @@ public class Main {
         BinaryTree<Integer> binaryTree = new BinaryTree<>();
         for (int i = 0; i < 10; i++)
             binaryTree.add(randomGenerator.nextInt(100) + 1);
-        binaryTree.print();
-        int rootIndex = binaryTree.getRoot().getLeftChild() != null ? binaryTree.getRoot().getLeftChild().getWeight() : 0;
-        binaryTree.deleteByIndex(2);
-        binaryTree.print();
+        binaryTree.print("index");
+        /*int rootIndex, temp;
+        for(int i = 0; i < 2; i++) {
+            rootIndex = binaryTree.getRoot().getLeftChild() != null ? binaryTree.getRoot().getLeftChild().getWeight() : 0;
+            temp = binaryTree.getRoot().getValue();
+            binaryTree.deleteByIndex(rootIndex);
+            binaryTree.add(temp);
+            binaryTree.print();
+        }*/
     }
 }

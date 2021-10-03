@@ -25,23 +25,23 @@ public class Node<Type> implements Comparable<Node> {
 
     public void setWeight(int weight) { this.weight = weight; }
 
-    public Node getParent() { return this.parent; }
+    public Node<Type> getParent() { return this.parent; }
 
-    public void setParent(final Node parent) { this.parent = parent; }
+    public void setParent(final Node<Type> parent) { this.parent = parent; }
 
-    public Node getLeftChild() {
+    public Node<Type> getLeftChild() {
         return this.leftChild;
     }
 
-    public void setLeftChild(final Node leftChild) {
+    public void setLeftChild(final Node<Type> leftChild) {
         this.leftChild = leftChild;
     }
 
-    public Node getRightChild() {
+    public Node<Type> getRightChild() {
         return this.rightChild;
     }
 
-    public void setRightChild(final Node rightChild) {
+    public void setRightChild(final Node<Type> rightChild) {
         this.rightChild = rightChild;
     }
 
@@ -63,7 +63,7 @@ public class Node<Type> implements Comparable<Node> {
             else if ((int) this.value < (int) o.value) return -1;
             else if ((int) this.value > (int) o.value) return 1;
         }
-        if (this.value instanceof String) return this.value.toString().compareTo(o.value.toString());
+        else if (this.value instanceof String) return this.value.toString().compareTo(o.value.toString());
         return 0;
     }
 }
