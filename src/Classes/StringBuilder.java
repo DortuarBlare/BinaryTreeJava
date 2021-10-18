@@ -38,7 +38,7 @@ public class StringBuilder implements TypeBuilder {
     }
 
     @Override
-    public Comparator getComparator() {
+    public Interfaces.Comparator getComparator() {
         return (o1, o2) -> ((String)o1).compareTo((String)o2);
     }
 }

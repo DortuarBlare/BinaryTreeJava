@@ -3,6 +3,7 @@ package Classes;
 import Interfaces.TypeBuilder;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Set;
 
 public class TypeFactory {
@@ -12,13 +13,13 @@ public class TypeFactory {
         typeNames = new HashMap<>();
 
         TypeBuilder typeBuilder = new IntegerBuilder();
-        typeNames.put(typeBuilder.typeName(), typeBuilder);
+        typeNames.put(typeBuilder.typeName().toLowerCase(), typeBuilder);
 
         typeBuilder = new StringBuilder();
-        typeNames.put(typeBuilder.typeName(), typeBuilder);
+        typeNames.put(typeBuilder.typeName().toLowerCase(), typeBuilder);
     }
 
     public static Set<String> getTypeNamesSet() { return typeNames.keySet(); }
 
-    public static TypeBuilder getTypeBuilderByName(String name) { return typeNames.get(name); }
+    public static TypeBuilder getTypeBuilderByName(String name) { return typeNames.get(name.toLowerCase()); }
 }

@@ -16,18 +16,18 @@ public class IntegerBuilder implements TypeBuilder {
     }
 
     @Override
-    public Object create() {
+    public Integer create() {
         return new Random().nextInt(100) + 1;
     }
 
     @Override
-    public Object read(InputStream in) {
+    public Integer read(InputStream in) {
         return Integer.parseInt(new BufferedReader(new InputStreamReader(in))
                 .lines().collect(Collectors.joining("\n")));
     }
 
     @Override
-    public Comparator getComparator() {
+    public Interfaces.Comparator getComparator() {
         return (o1, o2) -> (Integer)o1 - (Integer)o2;
     }
 }

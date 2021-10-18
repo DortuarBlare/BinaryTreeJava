@@ -1,6 +1,7 @@
 package Classes;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Stack;
 
 public class BinaryTree<Type> implements Iterable<Node> {
@@ -100,6 +101,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
             }
             currentNode.setWeight(currentNode.getWeight() - 1);
         }
+        System.out.println("Удаляемый узел: " + currentNode);
 
         if (currentNode.getLeftChild() == null && currentNode.getRightChild() == null) { // Если у узла нет потомков
             if (currentNode == root) root = null;
@@ -118,10 +120,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
         }
         else { // Если у узла два потомка
             Node heir = findHeir(currentNode);
-            if (currentNode == root) {
-                heir.setWeight(root.getWeight());
-                root = heir;
-            }
+            if (currentNode == root) root = heir;
             else if (isLeftChild) currentNode.getParent().setLeftChild(heir);
             else currentNode.getParent().setRightChild(heir);
         }
@@ -135,19 +134,26 @@ public class BinaryTree<Type> implements Iterable<Node> {
             heir = heir.getLeftChild();
         }
 
-        if (heir != nodeThatNeedHeir.getRightChild()) { // Если наследник не правый потомок
+        if (heir == nodeThatNeedHeir.getRightChild()) { // Если наследник правый потомок
+            heir.setLeftChild(nodeThatNeedHeir.getLeftChild());
+        }
+        else {
             heir.getParent().setLeftChild(heir.getRightChild());
             heir.setLeftChild(nodeThatNeedHeir.getLeftChild());
             heir.setRightChild(nodeThatNeedHeir.getRightChild());
         }
-        else heir.setLeftChild(nodeThatNeedHeir.getLeftChild());
+        heir.setParent(nodeThatNeedHeir.getParent());
+
+        heir.setWeight(nodeThatNeedHeir.getWeight());
+
         return heir;
     }
 
     public void print(String indexOrWeight) { // Вывод дерева с весом узлов в консоль
         Stack globalStack = new Stack(); // общий стек для значений дерева
         globalStack.push(root);
-        int gaps = 64; // начальное значение расстояния между элементами
+        //int gaps = 64 * ((getSize() / 10) + (getSize() % 10 == 0 ? 0 : 1)); // начальное значение расстояния между элементами
+        int gaps = 64;
         boolean isRowEmpty = false;
         String separator = "-----------------------------------------------------------------";
         System.out.print('\n' + separator);
@@ -162,7 +168,8 @@ public class BinaryTree<Type> implements Iterable<Node> {
             while (globalStack.isEmpty() == false) { // покуда в общем стеке есть элементы
                 Node temp = (Node) globalStack.pop(); // берем следующий, при этом удаляя его из стека
                 if (temp != null) {
-                    if (indexOrWeight == "index") System.out.print(temp.getValue() + "(" + getIndex(temp) + ")");
+                    if (indexOrWeight.toLowerCase().compareTo("index") == 0)
+                        System.out.print(temp.getValue() + "(" + getIndex(temp) + ")");
                     else System.out.print(temp.getValue() + "(" + temp.getWeight() + ")");
 
                     localStack.push(temp.getLeftChild()); // соохраняем в локальный стек, наследники текущего элемента
