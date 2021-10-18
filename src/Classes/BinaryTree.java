@@ -121,8 +121,10 @@ public class BinaryTree<Type> implements Iterable<Node> {
         else { // Если у узла два потомка
             Node heir = findHeir(currentNode);
             if (currentNode == root) root = heir;
-            else if (isLeftChild) currentNode.getParent().setLeftChild(heir);
-            else currentNode.getParent().setRightChild(heir);
+            //else if (isLeftChild) currentNode.getParent().setLeftChild(heir);
+            else if (isLeftChild) heir.getParent().setLeftChild(heir);
+            //else currentNode.getParent().setRightChild(heir);
+            else heir.getParent().setRightChild(heir);
         }
     }
 
