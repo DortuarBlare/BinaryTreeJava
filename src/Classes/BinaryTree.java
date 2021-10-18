@@ -1,18 +1,25 @@
-import java.util.Comparator;
+package Classes;
+
 import java.util.Iterator;
 import java.util.Stack;
 
 public class BinaryTree<Type> implements Iterable<Node> {
     private Node<Type> root;
-    private NodeComparator nodeComparator;
+    private Interfaces.Comparator comparator;
 
     public BinaryTree() {
         root = null;
-        nodeComparator = new NodeComparator();
+        comparator = null;
+    }
+
+    public BinaryTree(Interfaces.Comparator comparator) {
+        root = null;
+        this.comparator = comparator;
     }
 
     public void add(Type value) {
         Node newNode = new Node(value);
+
         if (root == null) root = newNode;
         else if (findByValue(value) == null) {
             root.setWeight(root.getWeight() + 1);
@@ -20,20 +27,20 @@ public class BinaryTree<Type> implements Iterable<Node> {
             Node parentNode;
             while (true) {
                 parentNode = currentNode;
-                if (newNode.compareTo(currentNode) < 0) {   // движение влево?
+                if (comparator.compare(value, currentNode.getValue()) < 0) {   // Двигаемся влево
                     currentNode = currentNode.getLeftChild();
-                    if (currentNode == null) { // если был достигнут конец цепочки,
-                        parentNode.setLeftChild(newNode); //  вставить слева
-                        parentNode.getLeftChild().setParent(parentNode); // Назначить родителя
+                    if (currentNode == null) { //Конец цепочки
+                        parentNode.setLeftChild(newNode);
+                        parentNode.getLeftChild().setParent(parentNode);
                         return;
                     }
                     else currentNode.setWeight(currentNode.getWeight() + 1);
                 }
-                else { // Или направо?
+                else { // Двигаемся вправо
                     currentNode = currentNode.getRightChild();
-                    if (currentNode == null) { // если был достигнут конец цепочки,
-                        parentNode.setRightChild(newNode);  // вставить справа
-                        parentNode.getRightChild().setParent(parentNode); // Назначить родителя
+                    if (currentNode == null) { // Конец цепочки
+                        parentNode.setRightChild(newNode);
+                        parentNode.getRightChild().setParent(parentNode);
                         return;
                     }
                     else currentNode.setWeight(currentNode.getWeight() + 1);
@@ -43,10 +50,9 @@ public class BinaryTree<Type> implements Iterable<Node> {
     }
 
     public Node findByValue(Type value) {
-        Node nodeWithComparableValue = new Node(value);
         Node currentNode = root;
         while (value != currentNode.getValue()) {
-            if (nodeWithComparableValue.compareTo(currentNode) < 0) currentNode = currentNode.getLeftChild();
+            if (comparator.compare(value, currentNode.getValue()) < 0) currentNode = currentNode.getLeftChild();
             else currentNode = currentNode.getRightChild();
 
             if(currentNode == null) return null;
@@ -144,7 +150,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
         int gaps = 64; // начальное значение расстояния между элементами
         boolean isRowEmpty = false;
         String separator = "-----------------------------------------------------------------";
-        System.out.print(separator);
+        System.out.print('\n' + separator);
         System.out.println(separator);
 
         while (isRowEmpty == false) {
@@ -176,7 +182,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
                 globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
         }
         System.out.print(separator);
-        System.out.println(separator);
+        System.out.println(separator + '\n');
     }
 
     public int getIndex(Node nodeForIndex) {
@@ -184,7 +190,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
         int currentIndex = (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0);
 
         while (nodeForIndex.getValue() != currentNode.getValue()) {
-            if (nodeForIndex.compareTo(currentNode) < 0) {
+            if (comparator.compare(nodeForIndex.getValue(), currentNode.getValue()) < 0) {
                 currentNode = currentNode.getLeftChild();
                 currentIndex -= (currentNode.getRightChild() != null ? currentNode.getRightChild().getWeight() : 0) + 1;
             }
@@ -198,13 +204,27 @@ public class BinaryTree<Type> implements Iterable<Node> {
         return currentIndex;
     }
 
+    public int getDepth(Node nodeForDepth) {
+        int resultDepth = 0;
+
+        if (nodeForDepth != null) {
+            int leftDepth = getDepth(nodeForDepth.getLeftChild());
+            int rightDepth = getDepth(nodeForDepth.getRightChild());
+            resultDepth = Math.max(leftDepth, rightDepth);
+        }
+        return resultDepth;
+    }
+
     public Node<Type> getRoot() { return this.root; }
 
     public int getSize() { return root.getWeight(); }
+
+    public void setComparator(Interfaces.Comparator comparator) {
+        this.comparator = comparator;
+    }
 
     @Override
     public Iterator<Node> iterator() {
         return new BinaryTreeIterator(this);
     }
-
 }

@@ -1,16 +1,16 @@
-public class Node<Type> implements Comparable<Node> {
+package Classes;
+
+public class Node<Type> {
     private Type value; // Значение (содержимое) узла
-    private int weight = 1; // Вес узла (По умолчанию у всех равен 1)
+    private int weight; // Вес узла (По умолчанию у всех равен 1)
     private Node parent; // Узел родитель
     private Node leftChild; // Левый узел потомок
     private Node rightChild; // Правый узел потомок
 
     public Node(Type value) {
         this.value = value;
-    }
-
-    public void printNode() { // Вывод значения узла в консоль
-        System.out.println(" Выбранный узел имеет значение :" + value);
+        this.weight = 1;
+        parent = leftChild = rightChild = null;
     }
 
     public Type getValue() {
@@ -47,23 +47,12 @@ public class Node<Type> implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return "Node {" +
+        return "Classes.Node {" +
                 "value = " + value +
                 ", weight = " + weight +
                 ", parent = " + (parent != null ? parent.getValue() : "null") +
                 ", leftChild = " + (leftChild != null ? leftChild.getValue() : "null") +
                 ", rightChild = " + (rightChild != null ? rightChild.getValue() : "null") +
                 '}';
-    }
-
-    @Override
-    public int compareTo(Node o) { // 0 - Объекты равны, <0 - меньше, >0 - больше
-        if (this.value instanceof Integer) {
-            if (this.value == o.value) return 0;
-            else if ((int) this.value < (int) o.value) return -1;
-            else if ((int) this.value > (int) o.value) return 1;
-        }
-        else if (this.value instanceof String) return this.value.toString().compareTo(o.value.toString());
-        return 0;
     }
 }

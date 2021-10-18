@@ -1,3 +1,5 @@
+package Classes;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -27,6 +29,10 @@ public class BinaryTreeIterator implements Iterator<Node> {
             return currentNode;
         }
         finally { size--; }
+    }
+
+    public void forEach(Consumer<? super Node> action) {
+        Iterator.super.forEachRemaining(action);
     }
 
     @Override

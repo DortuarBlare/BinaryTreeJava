@@ -1,17 +1,23 @@
-import java.util.Iterator;
-import java.util.Random;
+import Classes.*;
+import Interfaces.TypeBuilder;
 
 public class Main {
 
     public static void main(String[] args) {
-        Random randomGenerator = new Random();
-        BinaryTree<Integer> binaryTree = new BinaryTree<>();
-        for (int i = 0; i < 10; i++)
-            binaryTree.add(randomGenerator.nextInt(100) + 1);
+        TypeBuilder builder = TypeFactory.getTypeBuilderByName("String");
+        if (builder == null) return;
+
+        BinaryTree<Object> binaryTree = new BinaryTree<>(builder.getComparator());
+        for(int i = 0; i < 5; i++)
+            binaryTree.add(builder.create());
         binaryTree.print("index");
 
-        for(Node i : binaryTree) {
-            System.out.println(i.getValue() + " ");
-        }
+        binaryTree.forEach(System.out::println);
+        // 🢁 эквиваленты 🢃
+        //for(Node i : binaryTree) System.out.println(i);
+
+        binaryTree.deleteByIndex(5);
+        System.out.println("\nTree after deleting node with index 5:");
+        binaryTree.print("index");
     }
 }
