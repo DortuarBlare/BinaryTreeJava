@@ -12,7 +12,7 @@ public class BinaryTreeIterator implements Iterator<Node> {
 
     public BinaryTreeIterator(BinaryTree binaryTree) {
         this.binaryTree = binaryTree;
-        this.size = binaryTree.getRoot().getWeight();
+        this.size = binaryTree.getSize();
     }
 
     @Override
