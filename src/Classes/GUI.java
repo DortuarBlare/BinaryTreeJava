@@ -166,7 +166,7 @@ public class GUI extends JFrame {
     }
 
     private void createDataTypeChoiceWindow() {
-        JDialog jDialog = new JDialog(this, "Choose data type for structure:", true);
+        JDialog jDialog = new JDialog(this, "Choose data type for structure: ", true);
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new FlowLayout());
         jDialog.setContentPane(jPanel);
@@ -189,7 +189,7 @@ public class GUI extends JFrame {
             typeBuilder = TypeFactory.getTypeBuilderByName("integer");
             if (typeBuilder == null) return;
             binaryTree = new BinaryTree<>(typeBuilder.getComparator());
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 5; i++)
                 binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
             timer.schedule(timerTask, 0, 10);
@@ -201,7 +201,7 @@ public class GUI extends JFrame {
             typeBuilder = TypeFactory.getTypeBuilderByName("string");
             if (typeBuilder == null) return;
             binaryTree = new BinaryTree<>(typeBuilder.getComparator());
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 5; i++)
                 binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
             timer.schedule(timerTask, 0, 10);
@@ -324,6 +324,14 @@ public class GUI extends JFrame {
             if (fileInputStream != null) {
                 objectInputStream = new ObjectInputStream(fileInputStream);
                 binaryTree = (BinaryTree<Object>) objectInputStream.readObject();
+                if (binaryTree.getRoot().getValue() instanceof Integer) {
+                    typeBuilder = TypeFactory.getTypeBuilderByName("integer");
+                    integerOrStringType = true;
+                }
+                else {
+                    typeBuilder = TypeFactory.getTypeBuilderByName("string");
+                    integerOrStringType = false;
+                }
                 binaryTree.setComparator(typeBuilder.getComparator());
             }
         }
@@ -335,6 +343,10 @@ public class GUI extends JFrame {
             catch (IOException e) { e.printStackTrace(); }
         }
     }
+
+    public TypeBuilder getTypeBuilder() { return typeBuilder; }
+
+    public BinaryTree<Object> getBinaryTree() { return binaryTree; }
 
     private class ViewPanel extends JPanel {
         private Point cameraPosition;

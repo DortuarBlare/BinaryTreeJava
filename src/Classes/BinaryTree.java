@@ -3,6 +3,7 @@ package Classes;
 import java.io.*;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 public class BinaryTree<Type> implements Iterable<Node>, Serializable {
     private Node<Type> root;
@@ -146,6 +147,10 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
             }
         }
         return currentNode;
+    }
+
+    public void forEach(Consumer<? super Node> action) {
+        new BinaryTreeIterator(this).forEach(action);
     }
 
     public void deleteByIndex(int index) {

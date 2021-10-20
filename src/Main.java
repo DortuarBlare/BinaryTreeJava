@@ -6,53 +6,47 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         GUI gui = new GUI();
-        /*int choice;
+        int choice;
         Scanner in = new Scanner(System.in);
-        System.out.print("Enter type of data, that you want to use in data structure(INTEGER or STRING): ");
-
-        TypeBuilder builder = TypeFactory.getTypeBuilderByName(in.next());
-        if (builder == null) return;
-
-        BinaryTree<Object> binaryTree = new BinaryTree<>(builder.getComparator());
 
         while (true) {
-            printMenu(binaryTree.getSize());
+            printMenu(gui.getBinaryTree().getSize());
             choice = in.nextInt();
 
             switch (choice) {
                 case 1:
                     System.out.print("Enter type of printing(INDEX or WEIGHT): ");
-                    binaryTree.print(in.next());
+                    gui.getBinaryTree().print(in.next());
                     break;
                 case 2:
                     System.out.print("Enter NUMBER of elements you want to add: ");
                     int size = in.nextInt();
                     for (int i = 0; i < size; i++)
-                        binaryTree.add(builder.create());
+                        gui.getBinaryTree().add(gui.getTypeBuilder().create());
                     break;
                 case 3:
                     System.out.print("Enter INDEX of node you want to find: ");
-                    System.out.println(binaryTree.findByIndex(in.nextInt()));
+                    System.out.println(gui.getBinaryTree().findByIndex(in.nextInt()));
                     break;
                 case 4:
                     System.out.print("Enter INDEX of node you want to delete: ");
-                    binaryTree.deleteByIndex(in.nextInt());
+                    gui.getBinaryTree().deleteByIndex(in.nextInt());
                     break;
                 case 5:
-                    //binaryTree.forEach(System.out::println);
+                    gui.getBinaryTree().forEach(System.out::println);
                     // 🢁 эквиваленты 🢃
-                    for (Node i : binaryTree) System.out.println(i);
+                    //for (Node i : gui.getBinaryTree()) System.out.println(i);
                     break;
                 case 6:
                     System.out.print("Enter INDEX of node for getting depth: ");
-                    System.out.println(binaryTree.getDepth(binaryTree.findByIndex(in.nextInt())));
+                    System.out.println(gui.getBinaryTree().getDepth(gui.getBinaryTree().findByIndex(in.nextInt())));
                     break;
                 case 0:
                     return;
                 default:
                     break;
             }
-        }*/
+        }
     }
 
     public static void printMenu(int size) {
