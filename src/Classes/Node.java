@@ -1,6 +1,8 @@
 package Classes;
 
-public class Node<Type> {
+import java.io.Serializable;
+
+public class Node<Type> implements Serializable {
     private Type value; // Значение (содержимое) узла
     private int weight; // Вес узла (По умолчанию у всех равен 1)
     private Node parent; // Узел родитель

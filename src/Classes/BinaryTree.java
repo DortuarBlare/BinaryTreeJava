@@ -1,11 +1,12 @@
 package Classes;
 
+import java.io.*;
 import java.util.Iterator;
 import java.util.Stack;
 
-public class BinaryTree<Type> implements Iterable<Node> {
+public class BinaryTree<Type> implements Iterable<Node>, Serializable {
     private Node<Type> root;
-    private Interfaces.Comparator comparator;
+    private transient Interfaces.Comparator comparator;
 
     public BinaryTree() {
         root = null;
@@ -51,6 +52,9 @@ public class BinaryTree<Type> implements Iterable<Node> {
         balance(newNode);
     }
 
+    /**
+     * Балансировка поворотом на основе весов левого и правого поддерева
+     */
     public void balance(Node node) {
         if (node == null) return;
 
@@ -61,6 +65,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
             rightDepth = getDepth(node.getRightChild());
 
             if (leftDepth > rightDepth && leftDepth - rightDepth > 1) {
+                // Правый поворот, так как глубина левого поддерева больше
                 if (node.getParent() != null) {
                     if (node.getParent().getRightChild() == node)
                         node.getParent().setRightChild(node.getLeftChild());
@@ -84,6 +89,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
                 node = node.getLeftChild();
             }
             else if (rightDepth > leftDepth && rightDepth - leftDepth > 1) {
+                // Левый поворот, так как глубина правого поддерева больше
                 if (node.getParent() != null) {
                     if (node.getParent().getRightChild() == node)
                         node.getParent().setRightChild(node.getRightChild());
@@ -197,6 +203,9 @@ public class BinaryTree<Type> implements Iterable<Node> {
         currentNode = null;
     }
 
+    /**
+     * Поиск преемника для удаляемого узла с двумя потомками
+     */
     public Node<Type> findHeir(Node nodeThatNeedHeir) {
         Node heir = nodeThatNeedHeir.getRightChild() != null ? nodeThatNeedHeir.getRightChild() : nodeThatNeedHeir;
 
@@ -225,12 +234,9 @@ public class BinaryTree<Type> implements Iterable<Node> {
     public void print(String indexOrWeight) { // Вывод дерева с весом узлов в консоль
         Stack globalStack = new Stack(); // общий стек для значений дерева
         globalStack.push(root);
-        //int gaps = 64 * ((getSize() / 10) + (getSize() % 10 == 0 ? 0 : 1)); // начальное значение расстояния между элементами
         int gaps = 128;
         boolean isRowEmpty = false;
-        String separator = "-----------------------------------------------------------------";
-        System.out.print('\n' + separator);
-        System.out.println(separator);
+        System.out.println();
 
         while (isRowEmpty == false) {
             Stack localStack = new Stack(); // локальный стек для задания потомков элемента
@@ -250,7 +256,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
                     if (temp.getLeftChild() != null || temp.getRightChild() != null) isRowEmpty = false;
                 }
                 else {
-                    System.out.print("  "); // - если элемент пустой
+                    System.out.print("__"); // - если элемент пустой
                     localStack.push(null);
                     localStack.push(null);
                 }
@@ -261,8 +267,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
             while (localStack.isEmpty() == false)
                 globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
         }
-        System.out.print(separator);
-        System.out.println(separator + '\n');
+        System.out.println('\n');
     }
 
     public int getIndex(Node nodeForIndex) {
@@ -297,7 +302,7 @@ public class BinaryTree<Type> implements Iterable<Node> {
 
     public Node<Type> getRoot() { return this.root; }
 
-    public int getSize() { return root.getWeight(); }
+    public int getSize() { return root == null ? 0 : root.getWeight(); }
 
     public void setComparator(Interfaces.Comparator comparator) {
         this.comparator = comparator;

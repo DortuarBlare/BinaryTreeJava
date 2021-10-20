@@ -17,7 +17,7 @@ public class StringBuilder implements TypeBuilder {
 
     @Override
     public Object create() {
-        return getRandomString(5);
+        return getRandomString(3);
     }
 
     @Override

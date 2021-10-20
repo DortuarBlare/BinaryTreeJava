@@ -5,7 +5,8 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        int choice;
+        GUI gui = new GUI();
+        /*int choice;
         Scanner in = new Scanner(System.in);
         System.out.print("Enter type of data, that you want to use in data structure(INTEGER or STRING): ");
 
@@ -15,7 +16,7 @@ public class Main {
         BinaryTree<Object> binaryTree = new BinaryTree<>(builder.getComparator());
 
         while (true) {
-            printMenu();
+            printMenu(binaryTree.getSize());
             choice = in.nextInt();
 
             switch (choice) {
@@ -51,11 +52,15 @@ public class Main {
                 default:
                     break;
             }
-        }
+        }*/
     }
 
-    public static void printMenu() {
+    public static void printMenu(int size) {
         System.out.println("==============================");
+        System.out.print("= Tree size: " + size);
+        for (int i = 0; i < 16 - String.valueOf(size).length(); i++)
+            System.out.print(' ');
+        System.out.println('=');
         System.out.println("= 1) Print tree              =");
         System.out.println("= 2) Add node                =");
         System.out.println("= 3) Find node by index      =");

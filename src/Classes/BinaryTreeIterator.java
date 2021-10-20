@@ -31,10 +31,6 @@ public class BinaryTreeIterator implements Iterator<Node> {
         finally { size--; }
     }
 
-    public void forEach(Consumer<? super Node> action) {
-        Iterator.super.forEachRemaining(action);
-    }
-
     @Override
     public void forEachRemaining(Consumer<? super Node> action) {
         Iterator.super.forEachRemaining(action);
