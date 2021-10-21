@@ -10,18 +10,18 @@ import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Пользовательский графический интерфейс.
+ * Функционал:
+ * Выбор между двумя типами данных (целые числа или строки).
+ * Сохранение структуры данных в файл и загрузка из файла.
+ * Добавление элемента с вводом данных, добавление случайных элементов.
+ * Удаление элемента с вводом данных.
+ * Отображение индекса или веса узла над ним.
+ */
 public class GUI extends JFrame {
     private ViewPanel viewPanel;
-    private JMenu jMenuAdding;
-    private JMenu jMenuDeleting;
-    private JMenu jMenuShowing;
-    private JMenu jMenuFile;
-    private JMenuItem addingItem, adding1RandItem, adding3RandItem, adding5RandItem;
-    private JMenuItem deleteItem, saveItem, loadItem;
-    private JMenuBar jMenuBar;
-    private ButtonGroup groupButton;
-    private JRadioButton indexRadioButton, weightRadioButton;
-    private JFileChooser fileChooser;
+    private MenuBar menuBar;
     private boolean showIndexesOrWeights;
     private boolean integerOrStringType;
 
@@ -91,80 +91,17 @@ public class GUI extends JFrame {
             }
         };
 
-        jMenuBar = new JMenuBar();
-        jMenuBar.setSize(200, 200);
-        jMenuBar.setVisible(true);
-
-        jMenuFile = new JMenu("File");
-        saveItem = new JMenuItem("Save");
-        saveItem.addActionListener(e -> {
-            fileChooser = new JFileChooser("src");
-            fileChooser.setDialogTitle("Save data structure");
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
-                save(fileChooser.getSelectedFile());
-        });
-        loadItem = new JMenuItem("Load");
-        loadItem.addActionListener(e -> {
-            fileChooser = new JFileChooser("src");
-            fileChooser.setDialogTitle("Load data structure");
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-            if (fileChooser.showDialog(this, "Load") == JFileChooser.APPROVE_OPTION)
-                load(fileChooser.getSelectedFile());
-        });
-        jMenuFile.add(saveItem);
-        jMenuFile.add(loadItem);
-
-        jMenuAdding = new JMenu("Adding");
-        addingItem = new JMenuItem("Add");
-        addingItem.addActionListener(e -> createAddingWindow());
-        adding1RandItem = new JMenuItem("Add 1 random");
-        adding1RandItem.addActionListener(e -> binaryTree.add(typeBuilder.create()));
-        adding3RandItem = new JMenuItem("Add 3 random");
-        adding3RandItem.addActionListener(e -> {
-            for (int i = 0; i < 3; i++)
-                binaryTree.add(typeBuilder.create());
-        });
-        adding5RandItem = new JMenuItem("Add 5 random");
-        adding5RandItem.addActionListener(e -> {
-            for (int i = 0; i < 5; i++)
-                binaryTree.add(typeBuilder.create());
-        });
-        jMenuAdding.add(addingItem);
-        jMenuAdding.add(adding1RandItem);
-        jMenuAdding.add(adding3RandItem);
-        jMenuAdding.add(adding5RandItem);
-
-        jMenuDeleting = new JMenu("Deleting");
-        deleteItem = new JMenuItem("Delete");
-        deleteItem.addActionListener(e -> createDeletingWindow());
-        jMenuDeleting.add(deleteItem);
-
-        jMenuShowing = new JMenu("Showing");
-        indexRadioButton = new JRadioButton("Show indexes");
-        indexRadioButton.setSelected(true);
-        indexRadioButton.addActionListener(e -> showIndexesOrWeights = true);
-        weightRadioButton = new JRadioButton("Show weights");
-        weightRadioButton.addActionListener(e -> showIndexesOrWeights = false);
-        showIndexesOrWeights = true;
-        groupButton = new ButtonGroup();
-        groupButton.add(indexRadioButton);
-        groupButton.add(weightRadioButton);
-        jMenuShowing.add(indexRadioButton);
-        jMenuShowing.add(weightRadioButton);
-
-        jMenuBar.add(jMenuFile);
-        jMenuBar.add(jMenuAdding);
-        jMenuBar.add(jMenuDeleting);
-        jMenuBar.add(jMenuShowing);
-        setJMenuBar(jMenuBar);
+        menuBar = new MenuBar();
+        setJMenuBar(menuBar);
 
         this.pack();
         this.setLocationRelativeTo(null);
         createDataTypeChoiceWindow();
     }
 
+    /**
+     * Создание модального окна для выбора типа данных для структуры
+     */
     private void createDataTypeChoiceWindow() {
         JDialog jDialog = new JDialog(this, "Choose data type for structure: ", true);
         JPanel jPanel = new JPanel();
@@ -181,6 +118,9 @@ public class GUI extends JFrame {
         JButton stringButton = new JButton("STRING");
         stringButton.setPreferredSize(new Dimension(125, 75));
         stringButton.setFont(new Font("Dialog", Font.BOLD, 16));
+        JLabel someText = new JLabel("5 random elements will be added                    \uD83E\uDC81");
+        JLabel someText1 = new JLabel("For moving camera use: mouse dragging or \uD83E\uDC80 \uD83E\uDC83 \uD83E\uDC82");
+
 
         integerButton.addActionListener(e -> {
             jDialog.setVisible(false);
@@ -189,7 +129,7 @@ public class GUI extends JFrame {
             typeBuilder = TypeFactory.getTypeBuilderByName("integer");
             if (typeBuilder == null) return;
             binaryTree = new BinaryTree<>(typeBuilder.getComparator());
-            for (int i = 0; i < 5; i++)
+            while (binaryTree.getSize() != 5)
                 binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
             timer.schedule(timerTask, 0, 10);
@@ -201,7 +141,7 @@ public class GUI extends JFrame {
             typeBuilder = TypeFactory.getTypeBuilderByName("string");
             if (typeBuilder == null) return;
             binaryTree = new BinaryTree<>(typeBuilder.getComparator());
-            for (int i = 0; i < 5; i++)
+            while (binaryTree.getSize() != 5)
                 binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
             timer.schedule(timerTask, 0, 10);
@@ -209,12 +149,17 @@ public class GUI extends JFrame {
 
         jPanel.add(integerButton);
         jPanel.add(stringButton);
+        jPanel.add(someText);
+        jPanel.add(someText1);
 
         jDialog.pack();
         jDialog.setLocationRelativeTo(this);
         jDialog.setVisible(true);
     }
 
+    /**
+     * Создание модального окна для добавление элемента с введенными данными
+     */
     private void createAddingWindow() {
         JDialog jDialog = new JDialog(this, "Enter adding data:", true);
         JPanel jPanel = new JPanel();
@@ -257,6 +202,9 @@ public class GUI extends JFrame {
         dataField.setFocusable(true);
     }
 
+    /**
+     * Создание модального окна для удаления элемента, хранящего введенные данные
+     */
     private void createDeletingWindow() {
         JDialog jDialog = new JDialog(this, "Enter deleting index:", true);
         JPanel jPanel = new JPanel();
@@ -296,6 +244,9 @@ public class GUI extends JFrame {
         dataField.setFocusable(true);
     }
 
+    /**
+     * Метод сохранения структуры данных в файл
+     */
     public synchronized void save(File file) {
         ObjectOutputStream objectOutputStream = null;
 
@@ -316,6 +267,9 @@ public class GUI extends JFrame {
         }
     }
 
+    /**
+     * Метод загрузки структуры данных из файла
+     */
     public synchronized void load(File file) {
         ObjectInputStream objectInputStream = null;
 
@@ -348,6 +302,11 @@ public class GUI extends JFrame {
 
     public BinaryTree<Object> getBinaryTree() { return binaryTree; }
 
+    /**
+     * Графическая панель, на которой отображается структура данных.
+     * Перемещение камеры возможно с помощью стрелок или перетаскивания мышки с любой зажатой кнопкой мышки.
+     * Примерно с 9 уровня узлы начинают криво отображаться, поэтому лучше обойтись 8 уровнями :)
+     */
     private class ViewPanel extends JPanel {
         private Point cameraPosition;
 
@@ -373,7 +332,7 @@ public class GUI extends JFrame {
                 int height = 0;
                 int leftCornerX = 0;
                 int treeDepth = binaryTree.getDepth(binaryTree.getRoot());
-                int distanceBetweenNodes = 1440 * (treeDepth > 7 ? treeDepth - 7 + 1 : 1);
+                int distanceBetweenNodes = 1440 * (treeDepth > 7 ? treeDepth - 7 : 1);
                 boolean isRowEmpty = false;
                 boolean forDrawRoot = true;
 
@@ -448,6 +407,91 @@ public class GUI extends JFrame {
                     if (height >= 2) distanceBetweenNodes /= 2;
                 }
             }
+        }
+    }
+
+    /**
+     * Панель управления, на которой содержится весь основной функционал
+     */
+    private class MenuBar extends JMenuBar {
+        private JMenu jMenuAdding;
+        private JMenu jMenuDeleting;
+        private JMenu jMenuShowing;
+        private JMenu jMenuFile;
+        private JMenuItem addingItem, adding1RandItem, adding3RandItem, adding5RandItem;
+        private JMenuItem deleteItem, saveItem, loadItem;
+        private ButtonGroup groupButton;
+        private JRadioButton indexRadioButton, weightRadioButton;
+        private JFileChooser fileChooser;
+
+        public MenuBar() {
+            super();
+            this.setSize(200, 200);
+            this.setVisible(true);
+
+            jMenuFile = new JMenu("File");
+            saveItem = new JMenuItem("Save");
+            saveItem.addActionListener(e -> {
+                fileChooser = new JFileChooser("src");
+                fileChooser.setDialogTitle("Save data structure");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
+                    save(fileChooser.getSelectedFile());
+            });
+            loadItem = new JMenuItem("Load");
+            loadItem.addActionListener(e -> {
+                fileChooser = new JFileChooser("src");
+                fileChooser.setDialogTitle("Load data structure");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+                if (fileChooser.showDialog(this, "Load") == JFileChooser.APPROVE_OPTION)
+                    load(fileChooser.getSelectedFile());
+            });
+            jMenuFile.add(saveItem);
+            jMenuFile.add(loadItem);
+
+            jMenuAdding = new JMenu("Adding");
+            addingItem = new JMenuItem("Add");
+            addingItem.addActionListener(e -> createAddingWindow());
+            adding1RandItem = new JMenuItem("Add 1 random");
+            adding1RandItem.addActionListener(e -> binaryTree.add(typeBuilder.create()));
+            adding3RandItem = new JMenuItem("Add 3 random");
+            adding3RandItem.addActionListener(e -> {
+                for (int i = 0; i < 3; i++)
+                    binaryTree.add(typeBuilder.create());
+            });
+            adding5RandItem = new JMenuItem("Add 5 random");
+            adding5RandItem.addActionListener(e -> {
+                for (int i = 0; i < 5; i++)
+                    binaryTree.add(typeBuilder.create());
+            });
+            jMenuAdding.add(addingItem);
+            jMenuAdding.add(adding1RandItem);
+            jMenuAdding.add(adding3RandItem);
+            jMenuAdding.add(adding5RandItem);
+
+            jMenuDeleting = new JMenu("Deleting");
+            deleteItem = new JMenuItem("Delete");
+            deleteItem.addActionListener(e -> createDeletingWindow());
+            jMenuDeleting.add(deleteItem);
+
+            jMenuShowing = new JMenu("Showing");
+            indexRadioButton = new JRadioButton("Show indexes");
+            indexRadioButton.setSelected(true);
+            indexRadioButton.addActionListener(e -> showIndexesOrWeights = true);
+            weightRadioButton = new JRadioButton("Show weights");
+            weightRadioButton.addActionListener(e -> showIndexesOrWeights = false);
+            showIndexesOrWeights = true;
+            groupButton = new ButtonGroup();
+            groupButton.add(indexRadioButton);
+            groupButton.add(weightRadioButton);
+            jMenuShowing.add(indexRadioButton);
+            jMenuShowing.add(weightRadioButton);
+
+            this.add(jMenuFile);
+            this.add(jMenuAdding);
+            this.add(jMenuDeleting);
+            this.add(jMenuShowing);
         }
     }
 }

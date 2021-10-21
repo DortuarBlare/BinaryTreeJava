@@ -1,14 +1,15 @@
-import Classes.*;
-import Interfaces.TypeBuilder;
+import Classes.GUI;
 
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public class Main {
     public static void main(String[] args) {
-        GUI gui = new GUI();
+        GUI gui = new GUI(); // Пользовательский интерфейс
         int choice;
         Scanner in = new Scanner(System.in);
 
+        // Интерфейс для тестирования дополнительных методов
         while (true) {
             printMenu(gui.getBinaryTree().getSize());
             choice = in.nextInt();

@@ -5,6 +5,13 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.function.Consumer;
 
+/**
+ * Структура данных двоичное дерево.
+ * Индексы в узах не хранятся явно.
+ * Вместо индексов хранится вес узла(количество потомков + 1).
+ * По умолчанию у всех узлов вес = 1.
+ * На основе веса узла вычисляется его индекс
+ */
 public class BinaryTree<Type> implements Iterable<Node>, Serializable {
     private Node<Type> root;
     private transient Interfaces.Comparator comparator;
@@ -43,13 +50,12 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
                     if (currentNode == null) { // Конец цепочки
                         parentNode.setRightChild(newNode);
                         parentNode.getRightChild().setParent(parentNode);
-                        return;
+                        break;
                     }
                     else currentNode.setWeight(currentNode.getWeight() + 1);
                 }
             }
         }
-
         balance(newNode);
     }
 
@@ -59,6 +65,8 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
     public void balance(Node node) {
         if (node == null) return;
 
+        Node child = null;
+        Node parent = null;
         int leftDepth, rightDepth;
 
         while (true) {
@@ -67,51 +75,63 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
 
             if (leftDepth > rightDepth && leftDepth - rightDepth > 1) {
                 // Правый поворот, так как глубина левого поддерева больше
-                if (node.getParent() != null) {
-                    if (node.getParent().getRightChild() == node)
-                        node.getParent().setRightChild(node.getLeftChild());
-                    else if (node.getParent().getLeftChild() == node)
-                        node.getParent().setLeftChild(node.getLeftChild());
+
+                child = node.getLeftChild();
+                parent = node.getParent();
+
+                if (parent != null) {
+                    if (parent.getRightChild() == node)
+                        parent.setRightChild(child);
+                    else if (parent.getLeftChild() == node)
+                        parent.setLeftChild(child);
                 }
-                else root = node.getLeftChild();
+                else root = child;
 
-                node.getLeftChild().setParent(node.getParent());
-                node.setParent(node.getLeftChild());
+                child.setParent(parent);
+                node.setParent(child);
 
-                node.setLeftChild(node.getLeftChild().getRightChild());
+                node.setLeftChild(child.getRightChild());
                 if (node.getLeftChild() != null)
                     node.getLeftChild().setParent(node);
-                node.getLeftChild().setRightChild(node);
 
-                node.setWeight(1 + node.getLeftChild().getWeight() + node.getRightChild().getWeight());
-                node.getLeftChild().setWeight(1 + node.getLeftChild().getLeftChild().getWeight() +
-                        node.getLeftChild().getRightChild().getWeight());
+                child.setRightChild(node);
 
-                node = node.getLeftChild();
+                node.setWeight(1 + (node.getLeftChild() != null ? node.getLeftChild().getWeight() : 0) +
+                        (node.getRightChild() != null ? node.getRightChild().getWeight() : 0));
+                child.setWeight(1 + (child.getLeftChild() != null ? child.getLeftChild().getWeight() : 0) +
+                        (child.getRightChild() != null ? child.getRightChild().getWeight() : 0));
+
+                node = child;
             }
             else if (rightDepth > leftDepth && rightDepth - leftDepth > 1) {
                 // Левый поворот, так как глубина правого поддерева больше
-                if (node.getParent() != null) {
-                    if (node.getParent().getRightChild() == node)
-                        node.getParent().setRightChild(node.getRightChild());
-                    else if (node.getParent().getLeftChild() == node)
-                        node.getParent().setLeftChild(node.getRightChild());
+
+                child = node.getRightChild();
+                parent = node.getParent();
+
+                if (parent != null) {
+                    if (parent.getRightChild() == node)
+                        parent.setRightChild(child);
+                    else if (parent.getLeftChild() == node)
+                        parent.setLeftChild(child);
                 }
-                else root = node.getRightChild();
+                else root = child;
 
-                node.getRightChild().setParent(node.getParent());
-                node.setParent(node.getRightChild());
+                child.setParent(parent);
+                node.setParent(child);
 
-                node.setRightChild(node.getRightChild().getLeftChild());
+                node.setRightChild(child.getLeftChild());
                 if (node.getRightChild() != null)
                     node.getRightChild().setParent(node);
-                node.getRightChild().setLeftChild(node);
 
-                node.setWeight(1 + node.getLeftChild().getWeight() + node.getRightChild().getWeight());
-                node.getRightChild().setWeight(1 + node.getRightChild().getLeftChild().getWeight() +
-                        node.getRightChild().getRightChild().getWeight());
+                child.setLeftChild(node);
 
-                node = node.getRightChild();
+                node.setWeight(1 + (node.getLeftChild() != null ? node.getLeftChild().getWeight() : 0) +
+                        (node.getRightChild() != null ? node.getRightChild().getWeight() : 0));
+                child.setWeight(1 + (child.getLeftChild() != null ? child.getLeftChild().getWeight() : 0) +
+                        (child.getRightChild() != null ? child.getRightChild().getWeight() : 0));
+
+                node = child;
             }
             if (node.getParent() != null)
                 node = node.getParent();
@@ -149,6 +169,10 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
         return currentNode;
     }
 
+    /**
+     * Аналог forEach у итератора.
+     * Действие, которое производится над всеми элементами передается в виде параметра
+     */
     public void forEach(Consumer<? super Node> action) {
         new BinaryTreeIterator(this).forEach(action);
     }
