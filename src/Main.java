@@ -6,11 +6,27 @@ import java.util.TreeMap;
 public class Main {
     public static void main(String[] args) {
         GUI gui = new GUI(); // Пользовательский интерфейс
-        int choice;
-        Scanner in = new Scanner(System.in);
+
+        // Тестирование на 1000 элементов
+        long lastTime = System.currentTimeMillis();
+        while (gui.getBinaryTree().getSize() != 200)
+            gui.getBinaryTree().add(gui.getTypeBuilder().create());
+        System.out.println("\nЗатрачено секунд на добавление " + gui.getBinaryTree().getSize() +  ": " + (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+
+        lastTime = System.currentTimeMillis();
+        gui.getBinaryTree().forEach(System.out::println);
+        System.out.println("\nЗатрачено секунд на forEach: " + (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+
+        lastTime = System.currentTimeMillis();
+        for (int i = 0; i < gui.getBinaryTree().getSize(); i++)
+            gui.getBinaryTree().findByIndex(i);
+        System.out.println("\nЗатрачено секунд на нахождение всех узлов: " + (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+
+        //int choice;
+        //Scanner in = new Scanner(System.in);
 
         // Интерфейс для тестирования дополнительных методов
-        while (true) {
+        /*while (true) {
             printMenu(gui.getBinaryTree().getSize());
             choice = in.nextInt();
 
@@ -47,7 +63,9 @@ public class Main {
                 default:
                     break;
             }
-        }
+        }*/
+
+
     }
 
     public static void printMenu(int size) {

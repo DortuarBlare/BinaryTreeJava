@@ -9,10 +9,12 @@ public class BinaryTreeIterator implements Iterator<Node> {
     private Node currentNode;
     private int size;
     private int index = 0;
+    private boolean foundFirstNode;
 
     public BinaryTreeIterator(BinaryTree binaryTree) {
         this.binaryTree = binaryTree;
         this.size = binaryTree.getSize();
+        foundFirstNode = false;
     }
 
     @Override
@@ -25,7 +27,28 @@ public class BinaryTreeIterator implements Iterator<Node> {
     public Node next() throws NoSuchElementException {
         if (size <= 0) throw new NoSuchElementException("No more nodes in tree!");
         try {
-            currentNode = binaryTree.findByIndex(index++);
+            if (!foundFirstNode) {
+                foundFirstNode = true;
+                currentNode = binaryTree.findByIndex(0);
+            }
+            else {
+                // Если есть правый потомок, тогда либо он,
+                // либо последний его левый потомок будет следующим узлом
+                if (currentNode.getRightChild() != null) {
+                    currentNode = currentNode.getRightChild();
+                    while (currentNode.getLeftChild() != null)
+                        currentNode = currentNode.getLeftChild();
+                }
+                else if (currentNode.getParent() != null) {
+                    while (binaryTree.getComparator().compare(currentNode.getValue(), currentNode.getParent().getValue()) > 0)
+                        currentNode = currentNode.getParent();
+
+                    if (binaryTree.getComparator().compare(currentNode.getValue(), currentNode.getParent().getValue()) < 0)
+                        currentNode = currentNode.getParent();
+                }
+            }
+
+            index++;
             return currentNode;
         }
         finally { size--; }

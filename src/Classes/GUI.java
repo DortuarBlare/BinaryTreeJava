@@ -118,7 +118,7 @@ public class GUI extends JFrame {
         JButton stringButton = new JButton("STRING");
         stringButton.setPreferredSize(new Dimension(125, 75));
         stringButton.setFont(new Font("Dialog", Font.BOLD, 16));
-        JLabel someText = new JLabel("5 random elements will be added                    \uD83E\uDC81");
+        JLabel someText = new JLabel("                                                                                  \uD83E\uDC81");
         JLabel someText1 = new JLabel("For moving camera use: mouse dragging or \uD83E\uDC80 \uD83E\uDC83 \uD83E\uDC82");
 
 
@@ -129,8 +129,8 @@ public class GUI extends JFrame {
             typeBuilder = TypeFactory.getTypeBuilderByName("integer");
             if (typeBuilder == null) return;
             binaryTree = new BinaryTree<>(typeBuilder.getComparator());
-            while (binaryTree.getSize() != 5)
-                binaryTree.add(typeBuilder.create());
+            //while (binaryTree.getSize() != 5)
+                //binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
             timer.schedule(timerTask, 0, 10);
         });
@@ -141,8 +141,8 @@ public class GUI extends JFrame {
             typeBuilder = TypeFactory.getTypeBuilderByName("string");
             if (typeBuilder == null) return;
             binaryTree = new BinaryTree<>(typeBuilder.getComparator());
-            while (binaryTree.getSize() != 5)
-                binaryTree.add(typeBuilder.create());
+            //while (binaryTree.getSize() != 5)
+                //binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
             timer.schedule(timerTask, 0, 10);
         });
@@ -316,7 +316,8 @@ public class GUI extends JFrame {
         }
 
         public synchronized void draw() {
-            repaint();
+            if (binaryTree.getSize() <= 200)
+                repaint();
         }
 
         @Override
@@ -332,13 +333,13 @@ public class GUI extends JFrame {
                 int height = 0;
                 int leftCornerX = 0;
                 int treeDepth = binaryTree.getDepth(binaryTree.getRoot());
-                int distanceBetweenNodes = 1440 * (treeDepth > 7 ? treeDepth - 7 : 1);
-                boolean isRowEmpty = false;
+                int distanceBetweenNodes = 1440 * treeDepth;
+                boolean rowEmpty = false;
                 boolean forDrawRoot = true;
 
-                while (isRowEmpty == false) {
+                while (!rowEmpty) {
                     Stack localStack = new Stack(); // локальный стек для задания потомков элемента
-                    isRowEmpty = true;
+                    rowEmpty = true;
                     height++;
                     if (height >= 2) {
                         leftCornerX -= distanceBetweenNodes / 2;
@@ -346,9 +347,10 @@ public class GUI extends JFrame {
                         nodePosition.y += 80;
                     }
 
-                    while (globalStack.isEmpty() == false) { // Пока в общем стеке есть элементы
+                    while (!globalStack.isEmpty()) { // Пока в общем стеке есть элементы
                         Node temp = (Node) globalStack.pop(); // Берем элемент, удаляя его из стека
                         if (temp != null) {
+                            // Если корень, то закрашиваем его красным цветом для наглядности
                             if (forDrawRoot) {
                                 g.setColor(new Color(139, 0, 0));
                                 g.fillOval(nodePosition.x, nodePosition.y, 30, 30);
@@ -359,42 +361,48 @@ public class GUI extends JFrame {
                                 g.fillOval(nodePosition.x, nodePosition.y, 30, 30);
                             }
 
+                            // Рисуем ребра к узлам
                             if (height == 1) {
+                                // Ребро к левому потомку
                                 if (temp.getLeftChild() != null)
                                     g.drawLine(nodePosition.x, nodePosition.y + 15,
                                             nodePosition.x - (distanceBetweenNodes / 2) + 15, nodePosition.y + 80);
 
+                                // Ребро к правому потомку
                                 if (temp.getRightChild() != null)
                                     g.drawLine(nodePosition.x + 30, nodePosition.y + 15,
                                             nodePosition.x + (distanceBetweenNodes / 2) + 15, nodePosition.y + 80);
                             }
                             else {
+                                // Ребро к левому потомку
                                 if (temp.getLeftChild() != null)
                                     g.drawLine(nodePosition.x, nodePosition.y + 15,
                                             nodePosition.x - (distanceBetweenNodes / 4) + 15, nodePosition.y + 80);
 
+                                // Ребро к правому потомку
                                 if (temp.getRightChild() != null)
                                     g.drawLine(nodePosition.x + 30, nodePosition.y + 15,
                                             nodePosition.x + (distanceBetweenNodes / 4) + 15, nodePosition.y + 80);
                             }
 
+                            // Рисуем значение узла
                             g.setColor(new Color(255, 255, 255));
                             g.drawString(temp.getValue() + "", nodePosition.x + 5, nodePosition.y + 19);
 
+                            // Рисуем индекс или вес узла
                             g.setColor(new Color(90, 90, 90));
                             if (showIndexesOrWeights)
                                 g.drawString(binaryTree.getIndex(temp) + "",
-                                    nodePosition.x + 10, nodePosition.y - 10);
+                                        nodePosition.x + 10, nodePosition.y - 10);
                             else
                                 g.drawString(temp.getWeight() + "",
                                         nodePosition.x + 10, nodePosition.y - 10);
 
-                            if (height == 2) nodePosition.x += distanceBetweenNodes;
-                            else if (height > 2) nodePosition.x += distanceBetweenNodes;
-
+                            // Изменяем положение по горизонтали для рисования следующего узла справа
+                            if (height >= 2) nodePosition.x += distanceBetweenNodes;
                             localStack.push(temp.getLeftChild()); // соохраняем в локальный стек, наследники текущего элемента
                             localStack.push(temp.getRightChild());
-                            if (temp.getLeftChild() != null || temp.getRightChild() != null) isRowEmpty = false;
+                            if (temp.getLeftChild() != null || temp.getRightChild() != null) rowEmpty = false;
                         }
                         else {
                             localStack.push(null);
@@ -402,8 +410,10 @@ public class GUI extends JFrame {
                             nodePosition.x += distanceBetweenNodes;
                         }
                     }
-                    while (localStack.isEmpty() == false)
+
+                    while (!localStack.isEmpty())
                         globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
+
                     if (height >= 2) distanceBetweenNodes /= 2;
                 }
             }
@@ -411,7 +421,7 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Панель управления, на которой содержится весь основной функционал
+     * Панель управления, на которой содержится весь основной функционал вьюшки
      */
     private class MenuBar extends JMenuBar {
         private JMenu jMenuAdding;
@@ -419,7 +429,7 @@ public class GUI extends JFrame {
         private JMenu jMenuShowing;
         private JMenu jMenuFile;
         private JMenuItem addingItem, adding1RandItem, adding3RandItem, adding5RandItem;
-        private JMenuItem deleteItem, saveItem, loadItem;
+        private JMenuItem deleteItem, saveItem, loadItem, showRootItem;
         private ButtonGroup groupButton;
         private JRadioButton indexRadioButton, weightRadioButton;
         private JFileChooser fileChooser;
@@ -482,11 +492,15 @@ public class GUI extends JFrame {
             weightRadioButton = new JRadioButton("Show weights");
             weightRadioButton.addActionListener(e -> showIndexesOrWeights = false);
             showIndexesOrWeights = true;
+            showRootItem = new JMenuItem("Get camera to root");
+            showRootItem.addActionListener(e -> viewPanel.cameraPosition.setLocation(GUI.this.getWidth() / 2, 0));
             groupButton = new ButtonGroup();
             groupButton.add(indexRadioButton);
             groupButton.add(weightRadioButton);
             jMenuShowing.add(indexRadioButton);
             jMenuShowing.add(weightRadioButton);
+            jMenuShowing.add(showRootItem);
+
 
             this.add(jMenuFile);
             this.add(jMenuAdding);

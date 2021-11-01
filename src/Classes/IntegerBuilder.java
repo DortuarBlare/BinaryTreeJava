@@ -1,6 +1,5 @@
 package Classes;
 
-import Interfaces.Comparator;
 import Interfaces.TypeBuilder;
 
 import java.io.BufferedReader;
@@ -17,7 +16,7 @@ public class IntegerBuilder implements TypeBuilder {
 
     @Override
     public Integer create() {
-        return new Random().nextInt(100) + 1;
+        return new Random().nextInt(50000) + 1;
     }
 
     @Override

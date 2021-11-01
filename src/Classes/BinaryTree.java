@@ -1,5 +1,7 @@
 package Classes;
 
+import Interfaces.Comparator;
+
 import java.io.*;
 import java.util.Iterator;
 import java.util.Stack;
@@ -33,30 +35,48 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
         else if (findByValue(value) == null) {
             root.setWeight(root.getWeight() + 1);
             Node currentNode = root;
-            Node parentNode;
+            //Node parentNode;
             while (true) {
-                parentNode = currentNode;
+                //parentNode = currentNode;
                 if (comparator.compare(value, currentNode.getValue()) < 0) {   // Двигаемся влево
-                    currentNode = currentNode.getLeftChild();
+                    if (currentNode.getLeftChild() != null) {
+                        currentNode = currentNode.getLeftChild();
+                        currentNode.setWeight(currentNode.getWeight() + 1);
+                    }
+                    else {
+                        currentNode.setLeftChild(newNode);
+                        currentNode.getLeftChild().setParent(currentNode);
+                        return;
+                    }
+                    /*currentNode = currentNode.getLeftChild();
                     if (currentNode == null) { //Конец цепочки
                         parentNode.setLeftChild(newNode);
                         parentNode.getLeftChild().setParent(parentNode);
                         return;
                     }
-                    else currentNode.setWeight(currentNode.getWeight() + 1);
+                    else currentNode.setWeight(currentNode.getWeight() + 1);*/
                 }
                 else { // Двигаемся вправо
-                    currentNode = currentNode.getRightChild();
+                    if (currentNode.getRightChild() != null) {
+                        currentNode = currentNode.getRightChild();
+                        currentNode.setWeight(currentNode.getWeight() + 1);
+                    }
+                    else {
+                        currentNode.setRightChild(newNode);
+                        currentNode.getRightChild().setParent(currentNode);
+                        return;
+                    }
+                    /*currentNode = currentNode.getRightChild();
                     if (currentNode == null) { // Конец цепочки
                         parentNode.setRightChild(newNode);
                         parentNode.getRightChild().setParent(parentNode);
                         break;
                     }
-                    else currentNode.setWeight(currentNode.getWeight() + 1);
+                    else currentNode.setWeight(currentNode.getWeight() + 1);*/
                 }
             }
         }
-        balance(newNode);
+        //balance(newNode);
     }
 
     /**
@@ -306,14 +326,14 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
         while (nodeForIndex.getValue() != currentNode.getValue()) {
             if (comparator.compare(nodeForIndex.getValue(), currentNode.getValue()) < 0) {
                 currentNode = currentNode.getLeftChild();
+                if (currentNode == null) return -1;
                 currentIndex -= (currentNode.getRightChild() != null ? currentNode.getRightChild().getWeight() : 0) + 1;
             }
             else {
                 currentNode = currentNode.getRightChild();
+                if (currentNode == null) return -1;
                 currentIndex += (currentNode.getLeftChild() != null ? currentNode.getLeftChild().getWeight() : 0) + 1;
             }
-
-            if(currentNode == null) return -1;
         }
         return currentIndex;
     }
@@ -332,6 +352,10 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
     public Node<Type> getRoot() { return this.root; }
 
     public int getSize() { return root == null ? 0 : root.getWeight(); }
+
+    public Interfaces.Comparator getComparator() {
+        return comparator;
+    }
 
     public void setComparator(Interfaces.Comparator comparator) {
         this.comparator = comparator;
