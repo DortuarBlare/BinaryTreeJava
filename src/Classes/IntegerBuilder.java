@@ -16,7 +16,7 @@ public class IntegerBuilder implements TypeBuilder {
 
     @Override
     public Integer create() {
-        return new Random().nextInt(50000) + 1;
+        return new Random().nextInt(10000000) + 1;
     }
 
     @Override

@@ -49,12 +49,13 @@ public class Node<Type> implements Serializable {
 
     @Override
     public String toString() {
-        return "Classes.Node {" +
-                "value = " + value +
-                ", weight = " + weight +
-                ", parent = " + (parent != null ? parent.getValue() : "null") +
-                ", leftChild = " + (leftChild != null ? leftChild.getValue() : "null") +
-                ", rightChild = " + (rightChild != null ? rightChild.getValue() : "null") +
-                '}';
+        return  (parent == null ? "ROOT " : "") +
+                "{ " +
+                "Value = " + value +
+                ", Weight = " + weight +
+                ", Parent = " + (parent != null ? parent.getValue() : "null") +
+                ", LeftChild = " + (leftChild != null ? leftChild.getValue() : "null") +
+                ", RightChild = " + (rightChild != null ? rightChild.getValue() : "null") +
+                " }";
     }
 }

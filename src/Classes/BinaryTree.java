@@ -76,92 +76,107 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
                 }
             }
         }
-        //balance(newNode);
     }
 
     /**
-     * Балансировка поворотом на основе весов левого и правого поддерева
+     * Балансировка поворотом на основе глубин левого и правого поддерева
      */
-    public void balance(Node node) {
-        if (node == null) return;
+    public void balance() {
+        Node node = null;
+        int leftSubtreeDepth = getDepth(root.getLeftChild());
+        int rightSubtreeDepth = getDepth(root.getRightChild());
 
-        Node child = null;
-        Node parent = null;
-        int leftDepth, rightDepth;
+        while (Math.abs(leftSubtreeDepth - rightSubtreeDepth) > 1) {
+            for (int i = 0; i < getSize(); i++) {
+                node = findByIndex(i);
 
-        while (true) {
-            leftDepth = getDepth(node.getLeftChild());
-            rightDepth = getDepth(node.getRightChild());
+                if (node == null) return;
 
-            if (leftDepth > rightDepth && leftDepth - rightDepth > 1) {
-                // Правый поворот, так как глубина левого поддерева больше
+                Node child = null;
+                Node parent = null;
+                int leftDepth, rightDepth;
 
-                child = node.getLeftChild();
-                parent = node.getParent();
+                while (true) {
+                    leftDepth = getDepth(node.getLeftChild());
+                    rightDepth = getDepth(node.getRightChild());
 
-                if (parent != null) {
-                    if (parent.getRightChild() == node)
-                        parent.setRightChild(child);
-                    else if (parent.getLeftChild() == node)
-                        parent.setLeftChild(child);
+                    if (leftDepth > rightDepth && leftDepth - rightDepth > 1) {
+                        // Правый поворот, так как глубина левого поддерева больше
+
+                        child = node.getLeftChild();
+                        parent = node.getParent();
+
+                        if (parent != null) {
+                            if (parent.getRightChild() == node)
+                                parent.setRightChild(child);
+                            else if (parent.getLeftChild() == node)
+                                parent.setLeftChild(child);
+                        }
+                        else root = child;
+
+                        child.setParent(parent);
+                        node.setParent(child);
+
+                        node.setLeftChild(child.getRightChild());
+                        if (node.getLeftChild() != null)
+                            node.getLeftChild().setParent(node);
+
+                        child.setRightChild(node);
+
+                        node.setWeight(1 + (node.getLeftChild() != null ? node.getLeftChild().getWeight() : 0) +
+                                (node.getRightChild() != null ? node.getRightChild().getWeight() : 0));
+                        child.setWeight(1 + (child.getLeftChild() != null ? child.getLeftChild().getWeight() : 0) +
+                                (child.getRightChild() != null ? child.getRightChild().getWeight() : 0));
+
+                        //node = child;
+                        break;
+                    }
+                    else if (rightDepth > leftDepth && rightDepth - leftDepth > 1) {
+                        // Левый поворот, так как глубина правого поддерева больше
+
+                        child = node.getRightChild();
+                        parent = node.getParent();
+
+                        if (parent != null) {
+                            if (parent.getRightChild() == node)
+                                parent.setRightChild(child);
+                            else if (parent.getLeftChild() == node)
+                                parent.setLeftChild(child);
+                        }
+                        else root = child;
+
+                        child.setParent(parent);
+                        node.setParent(child);
+
+                        node.setRightChild(child.getLeftChild());
+                        if (node.getRightChild() != null)
+                            node.getRightChild().setParent(node);
+
+                        child.setLeftChild(node);
+
+                        node.setWeight(1 + (node.getLeftChild() != null ? node.getLeftChild().getWeight() : 0) +
+                                (node.getRightChild() != null ? node.getRightChild().getWeight() : 0));
+                        child.setWeight(1 + (child.getLeftChild() != null ? child.getLeftChild().getWeight() : 0) +
+                                (child.getRightChild() != null ? child.getRightChild().getWeight() : 0));
+
+                        //node = child;
+                        break;
+                    }
+
+                    if (node.getParent() != null) node = node.getParent();
+                    else break;
                 }
-                else root = child;
 
-                child.setParent(parent);
-                node.setParent(child);
-
-                node.setLeftChild(child.getRightChild());
-                if (node.getLeftChild() != null)
-                    node.getLeftChild().setParent(node);
-
-                child.setRightChild(node);
-
-                node.setWeight(1 + (node.getLeftChild() != null ? node.getLeftChild().getWeight() : 0) +
-                        (node.getRightChild() != null ? node.getRightChild().getWeight() : 0));
-                child.setWeight(1 + (child.getLeftChild() != null ? child.getLeftChild().getWeight() : 0) +
-                        (child.getRightChild() != null ? child.getRightChild().getWeight() : 0));
-
-                node = child;
             }
-            else if (rightDepth > leftDepth && rightDepth - leftDepth > 1) {
-                // Левый поворот, так как глубина правого поддерева больше
-
-                child = node.getRightChild();
-                parent = node.getParent();
-
-                if (parent != null) {
-                    if (parent.getRightChild() == node)
-                        parent.setRightChild(child);
-                    else if (parent.getLeftChild() == node)
-                        parent.setLeftChild(child);
-                }
-                else root = child;
-
-                child.setParent(parent);
-                node.setParent(child);
-
-                node.setRightChild(child.getLeftChild());
-                if (node.getRightChild() != null)
-                    node.getRightChild().setParent(node);
-
-                child.setLeftChild(node);
-
-                node.setWeight(1 + (node.getLeftChild() != null ? node.getLeftChild().getWeight() : 0) +
-                        (node.getRightChild() != null ? node.getRightChild().getWeight() : 0));
-                child.setWeight(1 + (child.getLeftChild() != null ? child.getLeftChild().getWeight() : 0) +
-                        (child.getRightChild() != null ? child.getRightChild().getWeight() : 0));
-
-                node = child;
-            }
-            if (node.getParent() != null)
-                node = node.getParent();
-            else break;
+            leftSubtreeDepth = getDepth(root.getLeftChild());
+            rightSubtreeDepth = getDepth(root.getRightChild());
         }
+
     }
 
     public Node findByValue(Type value) {
         Node currentNode = root;
-        while (value != currentNode.getValue()) {
+        while (comparator.compare(value, currentNode.getValue()) != 0) {
             if (comparator.compare(value, currentNode.getValue()) < 0) currentNode = currentNode.getLeftChild();
             else currentNode = currentNode.getRightChild();
 
@@ -218,7 +233,7 @@ public class BinaryTree<Type> implements Iterable<Node>, Serializable {
             }
             currentNode.setWeight(currentNode.getWeight() - 1);
         }
-        System.out.println("Удаляемый узел: " + currentNode);
+        //System.out.println("Удаляемый узел: " + currentNode);
 
         if (currentNode.getLeftChild() == null && currentNode.getRightChild() == null) { // Если у узла нет потомков
             if (currentNode == root) root = null;

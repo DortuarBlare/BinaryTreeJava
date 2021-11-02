@@ -20,13 +20,15 @@ import java.util.TimerTask;
  * Отображение индекса или веса узла над ним.
  */
 public class GUI extends JFrame {
-    private ViewPanel viewPanel;
+    //private ViewPanel viewPanel;
     private MenuBar menuBar;
+    private JScrollPane nodesListPane;
+    private JTextPane nodesListText;
     private boolean showIndexesOrWeights;
     private boolean integerOrStringType;
 
-    private Timer timer;
-    private TimerTask timerTask;
+    //private Timer timer;
+    //private TimerTask timerTask;
     private Point clickedMousePosition, releaseMousePosition;
     private TypeBuilder typeBuilder;
     private BinaryTree<Object> binaryTree;
@@ -34,11 +36,12 @@ public class GUI extends JFrame {
     public GUI() {
         super("Binary Tree");
         this.setPreferredSize(new Dimension(1280, 1024));
+        //this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setVisible(true);
         this.setResizable(true);
         this.setFocusable(false);
-        this.addKeyListener(new KeyAdapter() {
+        /*this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
@@ -57,12 +60,12 @@ public class GUI extends JFrame {
                         break;
                 }
             }
-        });
+        });*/
 
         clickedMousePosition = new Point();
         releaseMousePosition = new Point();
 
-        this.addMouseListener(new MouseAdapter() {
+        /*this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
@@ -78,21 +81,29 @@ public class GUI extends JFrame {
                 viewPanel.cameraPosition.y += releaseMousePosition.y - clickedMousePosition.y;
                 clickedMousePosition = releaseMousePosition;
             }
-        });
+        });*/
 
-        viewPanel = new ViewPanel();
+        /*viewPanel = new ViewPanel();
         viewPanel.setPreferredSize(new Dimension(1280, 1024));
-        this.add(viewPanel);
+        this.add(viewPanel, BorderLayout.CENTER);
         timer = new Timer();
         timerTask = new TimerTask() {
             @Override
             public void run() {
                 viewPanel.draw();
             }
-        };
+        };*/
 
         menuBar = new MenuBar();
         setJMenuBar(menuBar);
+
+        nodesListText = new JTextPane();
+        nodesListText.setFont(new Font("Dialog", Font.PLAIN, 14));
+        nodesListText.setEditable(false);
+        nodesListPane = new JScrollPane(nodesListText);
+        nodesListPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        nodesListPane.setVisible(true);
+        this.add(nodesListPane, BorderLayout.CENTER);
 
         this.pack();
         this.setLocationRelativeTo(null);
@@ -118,8 +129,7 @@ public class GUI extends JFrame {
         JButton stringButton = new JButton("STRING");
         stringButton.setPreferredSize(new Dimension(125, 75));
         stringButton.setFont(new Font("Dialog", Font.BOLD, 16));
-        JLabel someText = new JLabel("                                                                                  \uD83E\uDC81");
-        JLabel someText1 = new JLabel("For moving camera use: mouse dragging or \uD83E\uDC80 \uD83E\uDC83 \uD83E\uDC82");
+        JLabel someText = new JLabel("Do not recommended to add more than 5000 elements in GUI");
 
 
         integerButton.addActionListener(e -> {
@@ -132,7 +142,7 @@ public class GUI extends JFrame {
             //while (binaryTree.getSize() != 5)
                 //binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
-            timer.schedule(timerTask, 0, 10);
+            //timer.schedule(timerTask, 0, 10);
         });
         stringButton.addActionListener(e -> {
             jDialog.setVisible(false);
@@ -144,13 +154,12 @@ public class GUI extends JFrame {
             //while (binaryTree.getSize() != 5)
                 //binaryTree.add(typeBuilder.create());
             jDialog.getOwner().setFocusable(true);
-            timer.schedule(timerTask, 0, 10);
+            //timer.schedule(timerTask, 0, 10);
         });
 
         jPanel.add(integerButton);
         jPanel.add(stringButton);
         jPanel.add(someText);
-        jPanel.add(someText1);
 
         jDialog.pack();
         jDialog.setLocationRelativeTo(this);
@@ -161,7 +170,7 @@ public class GUI extends JFrame {
      * Создание модального окна для добавление элемента с введенными данными
      */
     private void createAddingWindow() {
-        JDialog jDialog = new JDialog(this, "Enter adding data:", true);
+        JDialog jDialog = new JDialog(this, "Enter amount of elements you want to add:", true);
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new FlowLayout());
         jDialog.setContentPane(jPanel);
@@ -180,10 +189,13 @@ public class GUI extends JFrame {
         addButton.addActionListener(e -> {
             jDialog.setVisible(false);
             jDialog.dispose();
-            if (integerOrStringType)
-                binaryTree.add(Integer.parseInt(dataField.getText()));
-            else
-                binaryTree.add(dataField.getText());
+
+            int amountOfElements = Integer.parseInt(dataField.getText());
+            int finalSize = binaryTree.getSize() + amountOfElements;
+            while (binaryTree.getSize() != finalSize)
+                binaryTree.add(typeBuilder.create());
+            updateNodesListText();
+
             jDialog.getOwner().setFocusable(true);
         });
         cancelButton.addActionListener(e -> {
@@ -226,6 +238,7 @@ public class GUI extends JFrame {
             jDialog.setVisible(false);
             jDialog.dispose();
             binaryTree.deleteByIndex(Integer.parseInt(dataField.getText()));
+            updateNodesListText();
             jDialog.getOwner().setFocusable(true);
         });
         cancelButton.addActionListener(e -> {
@@ -298,6 +311,73 @@ public class GUI extends JFrame {
         }
     }
 
+    public void updateNodesListText() {
+        int leftSubtreeDepth;
+        int rightSubtreeDepth;
+        if (binaryTree.getRoot() == null) leftSubtreeDepth = rightSubtreeDepth = 0;
+        else {
+            leftSubtreeDepth = binaryTree.getRoot().getLeftChild() == null ? 0 :
+                    binaryTree.getDepth(binaryTree.getRoot().getLeftChild());
+            rightSubtreeDepth = binaryTree.getRoot().getRightChild() == null ? 0 :
+                    binaryTree.getDepth(binaryTree.getRoot().getRightChild());
+        }
+        String text = "Binary Tree Size: " + binaryTree.getSize() + "\t\t" +
+                      "Left subtree depth: " + leftSubtreeDepth + "\t\t" +
+                      "Right subtree depth: " + rightSubtreeDepth + '\n' +
+                      "Binary Tree Nodes Ordered By Indexes:\n\n";
+        int index = 0;
+        for (Node node : GUI.this.binaryTree) {
+            text += index++;
+            text += ": ";
+            text += node;
+            text += '\n';
+        }
+        nodesListText.setText(text);
+    }
+
+    public void binaryTreeTest(int size) {
+        System.out.println("===============================================================");
+        long lastTime = System.currentTimeMillis();
+        while (binaryTree.getSize() != size)
+            binaryTree.add(typeBuilder.create());
+        System.out.println("Затрачено секунд на добавление " + binaryTree.getSize() + " узлов: " +
+                (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+
+        System.out.println("Глубина левого поддерева: " +
+                binaryTree.getDepth(binaryTree.getRoot().getLeftChild()));
+        System.out.println("Глубина правого поддерева: " +
+                binaryTree.getDepth(binaryTree.getRoot().getRightChild()));
+
+
+        lastTime = System.currentTimeMillis();
+        binaryTree.balance();
+        System.out.println("\nЗатрачено секунд на балансировку: " +
+                (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+
+        System.out.println("Глубина левого поддерева после балансировки: " +
+                binaryTree.getDepth(binaryTree.getRoot().getLeftChild()));
+        System.out.println("Глубина правого поддерева после балансировки: " +
+                binaryTree.getDepth(binaryTree.getRoot().getRightChild()));
+
+
+        lastTime = System.currentTimeMillis();
+        binaryTree.forEach(Node::getValue);
+        System.out.println("\nЗатрачено секунд на forEach: " +
+                (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+
+        lastTime = System.currentTimeMillis();
+        for (int i = 0; i < binaryTree.getSize(); i++)
+            binaryTree.findByIndex(i);
+        System.out.println("\nЗатрачено секунд на нахождение всех узлов: " +
+                (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+
+        while (this.getBinaryTree().getSize() != 0)
+            binaryTree.deleteByIndex(0);
+        System.out.println("\nЗатрачено секунд на удаление всех узлов: " +
+                (((double) (System.currentTimeMillis() - lastTime))) / 1000);
+        System.out.println("===============================================================\n");
+    }
+
     public TypeBuilder getTypeBuilder() { return typeBuilder; }
 
     public BinaryTree<Object> getBinaryTree() { return binaryTree; }
@@ -312,12 +392,13 @@ public class GUI extends JFrame {
 
         public ViewPanel() {
             super();
-            cameraPosition = new Point(0, 0);
+            cameraPosition = new Point(640, 30);
         }
 
         public synchronized void draw() {
             if (binaryTree.getSize() <= 200)
                 repaint();
+            else this.setVisible(false);
         }
 
         @Override
@@ -429,7 +510,7 @@ public class GUI extends JFrame {
         private JMenu jMenuShowing;
         private JMenu jMenuFile;
         private JMenuItem addingItem, adding1RandItem, adding3RandItem, adding5RandItem;
-        private JMenuItem deleteItem, saveItem, loadItem, showRootItem;
+        private JMenuItem deleteItem, deleteAllItem, saveItem, loadItem, showRootItem;
         private ButtonGroup groupButton;
         private JRadioButton indexRadioButton, weightRadioButton;
         private JFileChooser fileChooser;
@@ -469,11 +550,13 @@ public class GUI extends JFrame {
             adding3RandItem.addActionListener(e -> {
                 for (int i = 0; i < 3; i++)
                     binaryTree.add(typeBuilder.create());
+                updateNodesListText();
             });
             adding5RandItem = new JMenuItem("Add 5 random");
             adding5RandItem.addActionListener(e -> {
                 for (int i = 0; i < 5; i++)
                     binaryTree.add(typeBuilder.create());
+                updateNodesListText();
             });
             jMenuAdding.add(addingItem);
             jMenuAdding.add(adding1RandItem);
@@ -483,7 +566,14 @@ public class GUI extends JFrame {
             jMenuDeleting = new JMenu("Deleting");
             deleteItem = new JMenuItem("Delete");
             deleteItem.addActionListener(e -> createDeletingWindow());
+            deleteAllItem = new JMenuItem("Delete all");
+            deleteAllItem.addActionListener(e -> {
+                while (binaryTree.getSize() != 0)
+                    binaryTree.deleteByIndex(0);
+                updateNodesListText();
+            });
             jMenuDeleting.add(deleteItem);
+            jMenuDeleting.add(deleteAllItem);
 
             jMenuShowing = new JMenu("Showing");
             indexRadioButton = new JRadioButton("Show indexes");
@@ -492,14 +582,14 @@ public class GUI extends JFrame {
             weightRadioButton = new JRadioButton("Show weights");
             weightRadioButton.addActionListener(e -> showIndexesOrWeights = false);
             showIndexesOrWeights = true;
-            showRootItem = new JMenuItem("Get camera to root");
-            showRootItem.addActionListener(e -> viewPanel.cameraPosition.setLocation(GUI.this.getWidth() / 2, 0));
+            //showRootItem = new JMenuItem("Get camera to root");
+            //showRootItem.addActionListener(e -> viewPanel.cameraPosition.setLocation(GUI.this.getWidth() / 2, 0));
             groupButton = new ButtonGroup();
             groupButton.add(indexRadioButton);
             groupButton.add(weightRadioButton);
             jMenuShowing.add(indexRadioButton);
             jMenuShowing.add(weightRadioButton);
-            jMenuShowing.add(showRootItem);
+            //jMenuShowing.add(showRootItem);
 
 
             this.add(jMenuFile);
