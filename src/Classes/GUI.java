@@ -118,7 +118,7 @@ public class GUI extends JFrame {
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new FlowLayout());
         jDialog.setContentPane(jPanel);
-        jDialog.setPreferredSize(new Dimension(350, 200));
+        jDialog.setPreferredSize(new Dimension(400, 200));
         jDialog.setDefaultCloseOperation(HIDE_ON_CLOSE);
         jDialog.setResizable(false);
         jDialog.setFocusable(true);
